@@ -13,15 +13,6 @@ function Role({ user, isAuthReady }) {
     // 세션 체크가 아직 안 끝났으면 대기
     if (!isAuthReady) return;
 
-    // 유저가 없거나(비로그인), 관리자가 아니면 차단
-    if (!user || user.role_id !== 1) {
-      if (alertShown.current) return;
-      alertShown.current = true;
-      alert("관리자 권한이 필요합니다.");
-      navigate("/main");
-      return;
-    }
-
     fetchUsers();
   }, [user, isAuthReady, navigate]);
 

@@ -36,15 +36,7 @@ function NewStationManagement({ user, isAuthReady }) {
 
   useEffect(function () {
     if (!isAuthReady) return;
-
-    if (!user || Number(user.role_id) !== 1) {
-      if (alertShown.current) return;
-      alertShown.current = true;
-      alert("관리자 권한이 필요합니다.");
-      navigate("/main");
-      return;
-    }
-
+    
     fetchFailureReasons();
   }, [user, isAuthReady, navigate]);
 
