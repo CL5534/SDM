@@ -94,6 +94,16 @@ export const login = async (req, res) => {
       }
     };
 
+// 로그아웃 (세션 파기)
+export const logout = (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      return res.status(500).json({ message: "로그아웃 실패" });
+    }
+    res.clearCookie("connect.sid"); // 세션 쿠키 삭제
+    res.json({ message: "로그아웃 성공" });
+  });
+};
 
 // 4. 세션 확인 함수 (프론트엔드 /me 요청에 대응)
 export const checkSession = (req, res) => {

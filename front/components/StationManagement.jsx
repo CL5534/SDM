@@ -19,20 +19,31 @@ function StationManagement({ user }) {
   const [activeDropdownId, setActiveDropdownId] = useState(null);
 
   useEffect(function () {
-    if (user) {
-      const stored = localStorage.getItem(`station_history_${user.id}`);
-      if (stored) setHistoryIds(JSON.parse(stored));
-    }
-  }, [user]);
-
-  useEffect(function () {
     fetchChargers();
     fetchFailureReasons();
   }, []);
 
+  // ✅ user가 바뀌면(로그인/로그아웃) 작업내역도 DB에서 다시 로드
+  useEffect(function () {
+    if (user) {
+      fetchMyHistoryIds();
+    } else {
+      setHistoryIds([]);
+    }
+  }, [user]);
+
   async function fetchChargers() {
     try {
-      const response = await fetch("http://localhost:3000/api/auth/stations");
+      const response = await fetch("http://localhost:3000/api/auth/stations", {
+        credentials: "include",
+      });
+
+      if (response.status === 401) {
+        alert("로그인이 필요합니다.");
+        navigate("/login");
+        return;
+      }
+
       const data = await response.json();
       if (response.ok) setChargers(data);
       setLoading(false);
@@ -44,15 +55,43 @@ function StationManagement({ user }) {
 
   async function fetchFailureReasons() {
     try {
-      const response = await fetch(
-        "http://localhost:3000/api/auth/failure-reasons"
-      );
+      const response = await fetch("http://localhost:3000/api/auth/failure-reasons", {
+        credentials: "include",
+      });
+
+      if (response.status === 401) {
+        alert("로그인이 필요합니다.");
+        navigate("/login");
+        return;
+      }
+
       if (response.ok) {
         const data = await response.json();
         setFailureReasons(data);
       }
     } catch (error) {
       console.error("고장 원인 로드 실패:", error);
+    }
+  }
+
+  // ✅ DB(maintenance_history)에서 내 작업 충전소 id 목록 가져오기
+  async function fetchMyHistoryIds() {
+    try {
+      const response = await fetch("http://localhost:3000/api/auth/my-history", {
+        credentials: "include",
+      });
+
+      if (response.status === 401) {
+        // 여기서는 팝업 열기 전에 막아주는게 깔끔
+        return;
+      }
+
+      if (response.ok) {
+        const data = await response.json(); // [3, 7, 12...]
+        setHistoryIds(data);
+      }
+    } catch (error) {
+      console.error("작업 내역 로드 실패:", error);
     }
   }
 
@@ -92,11 +131,19 @@ function StationManagement({ user }) {
 
   async function handleDelete(stationId) {
     if (!window.confirm(`No.${stationId} 충전소를 정말 삭제하시겠습니까?`)) return;
+
     try {
       const response = await fetch(
         `http://localhost:3000/api/auth/stations/${stationId}`,
-        { method: "DELETE" }
+        { method: "DELETE", credentials: "include" }
       );
+
+      if (response.status === 401) {
+        alert("로그인이 필요합니다.");
+        navigate("/login");
+        return;
+      }
+
       if (response.ok) {
         alert("삭제되었습니다.");
         fetchChargers();
@@ -114,6 +161,7 @@ function StationManagement({ user }) {
         `http://localhost:3000/api/auth/stations/${stationId}`,
         {
           method: "PUT",
+          credentials: "include",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             status_id: newStatusId,
@@ -122,22 +170,28 @@ function StationManagement({ user }) {
         }
       );
 
+      if (response.status === 401) {
+        alert("로그인이 필요합니다.");
+        navigate("/login");
+        return;
+      }
+
       if (response.ok) {
+        // ✅ 화면 목록 최신화
         fetchChargers();
 
-        // 수정 성공 시 히스토리에 저장
-        if (user) {
-          setHistoryIds(function (prev) {
-            if (!prev.includes(stationId)) {
-              const newHistory = [stationId, ...prev];
-              localStorage.setItem(
-                `station_history_${user.id}`,
-                JSON.stringify(newHistory)
-              );
-              return newHistory;
-            }
-            return prev;
-          });
+        // ✅ (DB 저장은 백엔드에서 이미 됨)
+        // 화면에서 작업내역도 바로 반영되게 state를 즉시 업데이트(최적화)
+        setHistoryIds(function (prev) {
+          if (!prev.includes(stationId)) {
+            return [stationId, ...prev];
+          }
+          return prev;
+        });
+
+        // ✅ 팝업 열려있으면 DB 기준으로 한번 더 동기화 (선택)
+        if (showHistory) {
+          fetchMyHistoryIds();
         }
       }
     } catch (error) {
@@ -160,10 +214,12 @@ function StationManagement({ user }) {
       next = [...current, reasonId];
     }
 
-    next.sort(); // 1,2,3 순서 유지
+    next.sort();
     const nextReasonId = next.length > 0 ? next.join(",") : null;
     handleUpdate(charger.id, String(charger.status_id), nextReasonId);
   }
+
+
 
   if (loading) return <div className="loading">데이터 로딩 중...</div>;
 
@@ -173,6 +229,8 @@ function StationManagement({ user }) {
         <button onClick={() => navigate("/main")} className="back-btn">
           ← 메인으로
         </button>
+        <div style={{ display: "flex", gap: "10px" }}>
+        </div>
         <h1>충전소 관리 및 현황</h1>
 
         <div className="header-controls">
@@ -186,7 +244,10 @@ function StationManagement({ user }) {
 
           {user && Number(user.role_id) === 2 && (
             <button
-              onClick={() => setShowHistory(true)}
+              onClick={async function () {
+                await fetchMyHistoryIds(); // ✅ DB에서 최신 작업내역 로드
+                setShowHistory(true);
+              }}
               className="history-btn"
             >
               📋 작업 내역
@@ -282,10 +343,7 @@ function StationManagement({ user }) {
                               );
 
                               return (
-                                <label
-                                  key={reason.id}
-                                  className="reasonOptionLabel"
-                                >
+                                <label key={reason.id} className="reasonOptionLabel">
                                   <input
                                     type="checkbox"
                                     checked={checked}
@@ -351,7 +409,9 @@ function StationManagement({ user }) {
               &lt; 이전
             </button>
 
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map(function (number) {
+            {Array.from({ length: totalPages }, function (_, i) {
+              return i + 1;
+            }).map(function (number) {
               return (
                 <button
                   key={number}
@@ -458,10 +518,7 @@ function StationManagement({ user }) {
                                             type="checkbox"
                                             checked={checked}
                                             onChange={() =>
-                                              handleFailureCheck(
-                                                charger,
-                                                String(reason.id)
-                                              )
+                                              handleFailureCheck(charger, String(reason.id))
                                             }
                                             disabled={Number(charger.status_id) !== 3}
                                             className="reasonOptionCheckbox"
@@ -513,3 +570,4 @@ function StationManagement({ user }) {
 }
 
 export default StationManagement;
+

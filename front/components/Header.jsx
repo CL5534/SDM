@@ -5,7 +5,8 @@ function Header({ user, setUser }) {
   const navigate = useNavigate();
 
   const handleLogout = function () {
-    localStorage.removeItem("currentUser");
+    localStorage.removeItem("user");
+    localStorage.removeItem("userRole");
     if (setUser) setUser(null);
 
     // 백엔드 세션 로그아웃 (쿠키 삭제 등)
