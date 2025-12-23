@@ -1,0 +1,29 @@
+:root {
+  --nav-bg: #ffffff;
+  --bg: #f4f6f8;
+  --text: #333333;
+  --muted: #64748b;
+  --primary: #16a394;
+  --primary-hover: #129184;
+  --card: #ffffff;
+  --border: #ddd;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --error: #d9534f;
+  --error-hover: #c9302c;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", Arial, sans-serif;
+}
+
+button {
+  font-family: inherit;
+}

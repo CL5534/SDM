@@ -1,0 +1,215 @@
+.new-station-page {
+  height: 100vh;
+  width: 100vw;
+
+  /* 🔥 여기서 스크롤 막고 있던거 제거 */
+  overflow: hidden;
+
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+
+  box-sizing: border-box;
+}
+
+.new-station-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  max-width: 90%;
+  margin: 0 auto 15px auto;
+  background-color: var(--card);
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+
+  /* ✅ 헤더는 고정 높이(스크롤 안에 포함 X) */
+  flex: 0 0 auto;
+  box-sizing: border-box;
+}
+
+.new-station-header h1 {
+  margin: 0;
+  font-size: 24px;
+  color: var(--text);
+}
+
+.new-station-content {
+  width: 100%;
+  max-width: 90%;
+  margin: 0 auto;
+
+  background-color: var(--card);
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+
+  /* ✅ 핵심: 남은 공간을 차지 + 내용만 세로 스크롤 */
+  flex: 1;
+  min-height: 0;        /* 🔥 flex 스크롤 버그 방지 */
+  overflow-y: auto;     /* ✅ 아래로 내려가게 */
+  overflow-x: hidden;
+
+  box-sizing: border-box;
+}
+
+.new-station-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.new-station-form .form-group {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  gap: 8px;
+}
+
+.new-station-form label {
+  font-weight: bold;
+  color: #555;
+}
+
+.new-station-form input,
+.new-station-form select {
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 16px;
+  box-sizing: border-box;
+}
+
+.btn-submit {
+  margin-top: 20px;
+  padding: 14px;
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-submit:hover {
+  background-color: var(--primary-hover);
+}
+
+/* back 버튼 */
+.back-btn {
+  background: none;
+  border: 1px solid var(--border);
+  padding: 8px 16px;
+  cursor: pointer;
+  border-radius: 4px;
+  margin-right: 20px;
+  font-size: 14px;
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.back-btn:hover {
+  background-color: #f5f5f5;
+}
+
+/* number input 스피너 제거 */
+.no-spin::-webkit-outer-spin-button,
+.no-spin::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* =========================
+   고장 원인 섹션
+   ========================= */
+
+.failureSection {
+  background-color: #f9fafb;
+  padding: 15px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+}
+
+.failureLabel {
+  color: #374151;
+  font-weight: bold;
+}
+
+.failureRow {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.failureRow--select {
+  margin-bottom: 10px;
+}
+
+.failureInput {
+  flex: 1;
+  height: 50px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.failureAddBtn {
+  height: 40px;
+  padding: 0 15px;
+  background-color: #0f172a;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.failureAddBtn:hover {
+  filter: brightness(0.92);
+}
+
+/* =========================
+   드롭다운 UI + 세로 overflow
+   ========================= */
+
+.reasonDropdownWrap {
+  position: relative;
+  width: 100%;
+}
+
+.reasonDropdownToggle {
+  width: 100%;
+  height: 50px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: #fff;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.reasonDropdownText {
+  font-size: 14px;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding-right: 8px;
+}
+
+.reasonDropdownChevron {
+  font-size: 12px;
+  color: #64748b;
+}
+
+/* ✅ 체크박스 목록만 세로 스크롤 */
+.reasonDropdownMenu {
+  position: absolute;
+  left:

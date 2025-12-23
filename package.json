@@ -1,0 +1,9 @@
+{
+  "name": "cdm-project",
+  "version": "1.0.0",
+  "scripts": {
+    "start-front": "cd front && npm run dev",
+    "start-back": "cd back && npm run dev",
+    "dev": "concurrently -n \"BACK,FRONT\" -c \"blue,magenta\" \"npm run start-back\" \"npm run start-front\""
+  }
+}

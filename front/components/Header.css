@@ -1,0 +1,143 @@
+/* Top Nav */
+.topNav {
+  width: 100%;
+  flex: 0 0 64px; /* 높이 고정 */
+  background: #21c59c;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.navInner {
+  height: 100%;
+  max-width: 1450px;
+  margin: 0 auto;
+  padding: 0 18px;
+  display: grid;
+  grid-template-columns: 220px 1fr 220px;
+  align-items: center;
+  gap: 12px;
+}
+
+.navLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.brandIcon {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  background: transparent;
+  color: var(--primary);
+}
+
+.brandText {
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  font-size: 18px;
+  color: var(--text);
+}
+
+/* ✅ 중앙 네비게이션: JSX 인라인 스타일 이쪽으로 이동 */
+.navCenter {
+  display: flex;
+  gap: 100px;
+  margin-left: 200px;
+  margin-right: auto;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ✅ Link 공통 스타일 (JSX 인라인 스타일 이쪽으로 이동) */
+.navItem {
+  text-decoration: none;
+  color: inherit;
+  font-weight: bold;
+}
+
+/* (원래 있던 버튼 스타일 유지용) */
+.navLink {
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font-size: 16px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.navLink:hover {
+  background: #f5f5f5;
+}
+
+.navRight {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.user-info {
+  display: inline-flex;
+  align-items: center;
+}
+
+.user-name {
+  color: var(--text);
+  font-weight: 700;
+}
+
+/* ✅ Logout 버튼 인라인 스타일 이쪽으로 이동 */
+.logoutBtn {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-left: 10px;
+  transition: background-color 0.3s;
+}
+
+.logoutBtn:hover {
+  background-color: #c0392b;
+}
+
+.loginBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font-size: 16px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.loginBtn:hover {
+  background: #f5f5f5;
+}
+
+.loginIcon {
+  display: inline-grid;
+  place-items: center;
+  opacity: 0.95;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .navInner {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .navCenter {
+    display: none;
+  }
+}
