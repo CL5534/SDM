@@ -32,6 +32,22 @@ function StationManagement({ user }) {
     }
   }, [user]);
 
+  // ✅ 드롭다운이 열려있을 때: 바깥 클릭하면 닫기
+  useEffect(function () {
+    if (!activeDropdownId) return;
+
+    function handleClickOutside(e) {
+      if (!e.target.closest(".reasonDropdownWrap")) {
+        setActiveDropdownId(null);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return function () {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [activeDropdownId]);
+
   async function fetchChargers() {
     try {
       const response = await fetch("http://localhost:3000/api/auth/stations", {
@@ -570,4 +586,3 @@ function StationManagement({ user }) {
 }
 
 export default StationManagement;
-

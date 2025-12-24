@@ -22,9 +22,13 @@ function NewStationManagement({ user, isAuthReady }) {
     failure_reason_id: "",
   });
 
+  const [errors, setErrors] = useState({});
+
   async function fetchFailureReasons() {
     try {
-      const response = await fetch("http://localhost:3000/api/auth/failure-reasons");
+      const response = await fetch("http://localhost:3000/api/auth/failure-reasons", {
+        credentials: "include",
+      });
       if (response.ok) {
         const data = await response.json();
         setFailureReasons(data);
@@ -74,6 +78,10 @@ function NewStationManagement({ user, isAuthReady }) {
     setFormData(function (prev) {
       return { ...prev, [name]: value };
     });
+
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: "" }));
+    }
   }
 
   function handleNewReasonInput(e) {
@@ -114,6 +122,7 @@ function NewStationManagement({ user, isAuthReady }) {
       const response = await fetch("http://localhost:3000/api/auth/failure-reasons", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ name: newReasonText }),
       });
 
@@ -140,7 +149,23 @@ function NewStationManagement({ user, isAuthReady }) {
   }
 
   async function handleSubmit(e) {
-    e.preventDefault();
+    if (e) e.preventDefault();
+
+    const newErrors = {};
+    if (!formData.id) {
+      newErrors.id = "기기 고유 번호(No.)를 입력해주세요.";
+    }
+    if (!formData.name.trim()) {
+      newErrors.name = "충전소명을 입력해주세요.";
+    }
+    if (!formData.address.trim()) {
+      newErrors.address = "주소를 입력해주세요.";
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
 
     const submitData = {
       id: Number(formData.id),
@@ -158,6 +183,7 @@ function NewStationManagement({ user, isAuthReady }) {
       const response = await fetch("http://localhost:3000/api/auth/stations", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify(submitData),
       });
 
@@ -167,11 +193,11 @@ function NewStationManagement({ user, isAuthReady }) {
         alert("새로운 충전소가 성공적으로 등록되었습니다.");
         navigate("/StationManagement");
       } else {
-        alert(data.message || "등록 실패");
+        setErrors({ id: data.message || "등록 실패 (이미 존재하는 번호일 수 있습니다.)" });
       }
     } catch (error) {
       console.error("등록 에러:", error);
-      alert("서버 연결 실패");
+      setErrors({ id: "서버 연결 실패" });
     }
   }
 
@@ -210,7 +236,7 @@ function NewStationManagement({ user, isAuthReady }) {
       </header>
 
       <div className="new-station-content">
-        <form onSubmit={handleSubmit} className="new-station-form">
+        <form className="new-station-form">
           <div className="form-group">
             <label>No. (기기 고유 번호)</label>
             <input
@@ -222,6 +248,9 @@ function NewStationManagement({ user, isAuthReady }) {
               className="no-spin"
               required
             />
+            {errors.id && (
+              <div style={{ color: "red", fontSize: "12px", marginTop: "5px" }}>{errors.id}</div>
+            )}
           </div>
 
           <div className="form-group">
@@ -234,6 +263,9 @@ function NewStationManagement({ user, isAuthReady }) {
               placeholder="예: 종각역"
               required
             />
+            {errors.name && (
+              <div style={{ color: "red", fontSize: "12px", marginTop: "5px" }}>{errors.name}</div>
+            )}
           </div>
 
           <div className="form-group">
@@ -245,6 +277,9 @@ function NewStationManagement({ user, isAuthReady }) {
               onChange={handleChange}
               required
             />
+            {errors.address && (
+              <div style={{ color: "red", fontSize: "12px", marginTop: "5px" }}>{errors.address}</div>
+            )}
           </div>
 
           <div className="form-group">
@@ -325,7 +360,7 @@ function NewStationManagement({ user, isAuthReady }) {
             </div>
           )}
 
-          <button type="submit" className="btn-submit">
+          <button type="button" onClick={handleSubmit} className="btn-submit">
             등록하기
           </button>
         </form>
