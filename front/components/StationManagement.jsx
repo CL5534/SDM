@@ -7,6 +7,7 @@ function StationManagement({ user }) {
   const [chargers, setChargers] = useState([]);
   const [loading, setLoading] = useState(true);
 
+
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -119,12 +120,12 @@ function StationManagement({ user }) {
     });
   }
 
-  // 2) 검색어 필터링
+  // 검색어 필터링
   const searchResults = displayChargers.filter(function (charger) {
     return charger.name.toLowerCase().includes(searchTerm.toLowerCase());
   });
 
-  // 3) 검색 결과가 있으면 결과값, 없으면 전체(필터된) 리스트
+  // 검색 결과가 있으면 결과값, 없으면 전체(필터된) 리스트
   const filteredChargers =
     searchTerm && searchResults.length > 0 ? searchResults : displayChargers;
 
@@ -134,6 +135,7 @@ function StationManagement({ user }) {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredChargers.slice(indexOfFirstItem, indexOfLastItem);
 
+  // 입력될 때마다 업데이트 + 페이지네이션이 1페이지로 초기화
   function handleSearch(e) {
     setSearchTerm(e.target.value);
     setCurrentPage(1);
@@ -250,6 +252,7 @@ function StationManagement({ user }) {
         <h1>충전소 관리 및 현황</h1>
 
         <div className="header-controls">
+          {/* 충전소명 검색 입력창 */}
           <input
             type="text"
             placeholder="충전소명 검색"
@@ -258,10 +261,11 @@ function StationManagement({ user }) {
             className="search-input"
           />
 
+          {/* 점검자: 작업 내역 버튼 표시 */}
           {user && Number(user.role_id) === 2 && (
             <button
               onClick={async function () {
-                await fetchMyHistoryIds(); // ✅ DB에서 최신 작업내역 로드
+                await fetchMyHistoryIds();
                 setShowHistory(true);
               }}
               className="history-btn"
@@ -270,6 +274,7 @@ function StationManagement({ user }) {
             </button>
           )}
 
+          {/* 관리자: 충전소 등록 버튼 표시 */}
           {user && Number(user.role_id) === 1 && (
             <button
               onClick={() => navigate("/NewStationManagement")}
@@ -414,7 +419,7 @@ function StationManagement({ user }) {
             </tbody>
           </table>
         </div>
-
+      {/** 페이지네이션  **/}
         {totalPages > 0 && (
           <div className="pagination">
             <button

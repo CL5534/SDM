@@ -165,54 +165,52 @@ function Google({ initialQuery, stations }) {
     }
   }, [query, ready]);
 
-  useEffect(() => {
-    if (!ready || !stations.length || !geocoderRef.current) return;
+  useEffect(function () {
+  if (!ready || !stations.length || !geocoderRef.current) return;
 
-    // 이전 마커 제거
-    stationMarkersRef.current.forEach((marker) => marker.setMap(null));
-    stationMarkersRef.current = [];
+  // 이전 마커 제거
+  stationMarkersRef.current.forEach(function (marker) {
+    marker.setMap(null);
+  });
+  stationMarkersRef.current = [];
 
-    const geocoder = geocoderRef.current;
 
-    stations.forEach((station) => {
-      geocoder.geocode({ address: station.name }, (results, status) => {
-        if (status === "OK" && results[0]) {
-          const location = results[0].geometry.location;
+  // 현재 모든 충전소 마커 표시
+  var geocoder = geocoderRef.current;
+  stations.forEach(function (station, idx) {
+  //console.log("충전소 정보", idx, station);
+  
+  //geocoder.geocode() 주소/장소명 문자열 → 좌표(위도/경도) 로 바꿔주는 함수
+    geocoder.geocode({ address: station.name }, function (results, status) {
+      if (status === "OK") {
+        var location = results[0].geometry.location;
+  //console.log("지오코딩 충전소 정보", results[0]);
+  // 지오코딩 결과(results[0])에서 얻은 좌표(location)로 충전소 마커 생성
+        var newMarker = new window.google.maps.Marker({
+          position: location,
+          map: isSearchModeRef.current ? null : mapRef.current,
+          title: station.name,
+        });
+  // 표시된 마커 상세설명
+        newMarker.addListener("click", function () {
+          var content = `
+            <div style="padding:5px; min-width:150px; color:black;">
+              <h3 style="margin:0 0 5px; font-size:16px;">${station.name}</h3>
+              <p style="margin:5px 0; font-size:13px;"><strong>상세 위치:</strong> ${station.detail_location || "정보 없음"}</p>
+              <p style="margin:0; font-size:12px; color:#666;">${station.address}</p>
+            </div>
+          `;
+          infoWindowRef.current.setContent(content);
+          infoWindowRef.current.open(mapRef.current, newMarker);
+        });
 
-          const statusMap = {
-            1: "사용 가능",
-            2: "점검 중",
-            3: "고장",
-          };
-          const title = `${station.name}\n상태: ${
-            statusMap[station.status_id] || "알 수 없음"
-          }`;
-
-          const newMarker = new window.google.maps.Marker({
-            position: location,
-            map: isSearchModeRef.current ? null : mapRef.current,
-            title: title,
-          });
-
-          newMarker.addListener("click", () => {
-            const content = `
-              <div style="padding:5px; min-width:150px; color:black;">
-                <h3 style="margin:0 0 5px; font-size:16px;">${station.name}</h3>
-                <p style="margin:5px 0; font-size:13px;"><strong>상세 위치:</strong> ${station.detail_location || "정보 없음"}</p>
-                <p style="margin:0; font-size:12px; color:#666;">${station.address}</p>
-              </div>
-            `;
-            infoWindowRef.current.setContent(content);
-            infoWindowRef.current.open(mapRef.current, newMarker);
-          });
-
-          stationMarkersRef.current.push(newMarker);
-        } else {
-          console.warn(`'${station.name}' 지오코딩 실패: ${status}`);
-        }
-      });
+        stationMarkersRef.current.push(newMarker);
+      } else {
+        console.warn("'" + station.name + "' 지오코딩 실패: " + status);
+      }
     });
-  }, [ready, stations]);
+  });
+}, [ready, stations]);
 
   const onKeyDown = (e) => {
     if (e.key === "Enter") {

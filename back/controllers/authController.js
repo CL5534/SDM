@@ -40,7 +40,7 @@ export const signup = async (req, res) => {
 
       // 2단계: 비밀번호 해시 처리
       const salt = await bcrypt.genSalt(10);
-     const hashedPassword = await bcrypt.hash(password, salt);
+      const hashedPassword = await bcrypt.hash(password, salt);
 
       // 3단계 권한
       const role_id = email.endsWith(ADMIN_DOMAIN) ? 1 : 2; // 도메인에 따라 권한 부여 (1: 관리자, 2: 점검자)

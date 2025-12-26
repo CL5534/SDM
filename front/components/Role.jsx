@@ -129,15 +129,16 @@ function Role({ user, isAuthReady }) {
             </thead>
 
             <tbody>
+              {/* userList(서버 데이터) → map으로 테이블 생성 */}
               {userList.map(function (u) {
                 return (
                   <tr key={u.id}>
                     <td className="td-id">{u.id}</td>
                     <td>{u.name}</td>
                     <td>{u.email}</td>
-
                     <td>
                       <select
+                  /* admin@gmail.com 계정은 권한 변경을 막기 위해 select 비활성화 */
                         value={u.role_id}
                         onChange={function (e) {
                           handleRoleChange(u.id, e.target.value);
@@ -149,7 +150,6 @@ function Role({ user, isAuthReady }) {
                         <option value={2}>점검자</option>
                       </select>
                     </td>
-
                     <td>
                       {u.email !== "admin@gmail.com" && (
                         <>

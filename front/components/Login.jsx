@@ -49,6 +49,7 @@ function Login({ setUser }) {
             if (password.length < 6) {
                 pwMsg.push("6자리 이상");
             }
+
             
             if (pwMsg.length > 0) {
                 newErrors.password = "비밀번호는 " + pwMsg.join(", ") + "이어야 합니다.";

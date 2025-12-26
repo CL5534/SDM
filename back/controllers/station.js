@@ -13,7 +13,7 @@ const db = mysql
   })
   .promise();
 
-// 1. 전체 충전소 목록 조회
+// 전체 충전소 목록 조회
 export async function getStations(req, res) {
   try {
     const query = `
@@ -30,18 +30,18 @@ export async function getStations(req, res) {
   }
 }
 
-// 2. 상태 업데이트 (+ maintenance_history 저장)
+// 상태 업데이트 (+ maintenance_history 저장)
 export async function updateStationStatus(req, res) {
   const { id } = req.params;
   const { status_id, failure_reason_id } = req.body;
 
-  // ✅ 세션 로그인 확인 (user_id NOT NULL 때문에 필수)
+  // 세션 로그인 확인 (user_id NOT NULL 때문에 필수)
   if (!req.session || !req.session.user) {
     return res.status(401).json({ message: "로그인이 필요합니다." });
   }
   const userId = Number(req.session.user.id);
 
-  // ✅ 빈 값이면 null로 저장
+  // 빈 값이면 null로 저장
   let newFailureReasonId = failure_reason_id;
   if (newFailureReasonId === "" || newFailureReasonId === undefined) {
     newFailureReasonId = null;
@@ -72,12 +72,12 @@ export async function updateStationStatus(req, res) {
 
     const old = rows[0];
 
-    // 2) 변경 여부 판단(같은 값이면 히스토리 저장 안 함)
+    // 변경 여부 판단(같은 값이면 히스토리 저장 안 함)
     const isChanged =
       Number(old.old_status_id) !== Number(status_id) ||
       String(old.old_failure_reason_id ?? "") !== String(newFailureReasonId ?? "");
 
-    // 3) stations_address 업데이트
+    // stations_address 업데이트
     const updateSql = `
       UPDATE stations_address
       SET status_id = ?, failure_reason_id = ?
@@ -85,7 +85,7 @@ export async function updateStationStatus(req, res) {
     `;
     await conn.query(updateSql, [status_id, newFailureReasonId, old.stations_address_id]);
 
-    // 4) maintenance_history 저장 (변경된 경우에만)
+    // maintenance_history 저장 (변경된 경우에만)
     if (isChanged) {
       const insertSql = `
         INSERT INTO maintenance_history
@@ -106,7 +106,7 @@ export async function updateStationStatus(req, res) {
   }
 }
 
-// 3. 새로운 충전소 등록
+// 새로운 충전소 등록
 export async function createStation(req, res) {
   const { id, name, address, detail_location, status_id, failure_reason_id } = req.body;
   const conn = await db.getConnection();
@@ -137,7 +137,7 @@ export async function createStation(req, res) {
   }
 }
 
-// 4. 충전소 삭제
+// 충전소 삭제
 export async function deleteStation(req, res) {
   const { id } = req.params;
   const conn = await db.getConnection();
@@ -166,9 +166,8 @@ export async function deleteStation(req, res) {
   }
 }
 
-// --- ★ 고장 원인 관리 로직 추가 ★ ---
 
-// 5. 고장 원인 목록 조회 (GET)
+// 고장 원인 목록 조회 (GET)
 export async function getFailureReasons(req, res) {
   try {
     const query = "SELECT id, reason_text AS name FROM failure_reasons ORDER BY id ASC";
@@ -180,7 +179,7 @@ export async function getFailureReasons(req, res) {
   }
 }
 
-// 6. 새로운 고장 원인 등록 (POST)
+// 새로운 고장 원인 등록 (POST)
 export async function createFailureReason(req, res) {
   const { name } = req.body;
   if (!name) return res.status(400).json({ message: "내용을 입력해주세요." });
@@ -196,7 +195,7 @@ export async function createFailureReason(req, res) {
   }
 }
 
-// 🔴 7. 내 작업 내역(충전소 ID 목록) 조회 - maintenance_history 기반
+// 내 작업 내역(충전소 ID 목록) 조회 - maintenance_history 기반
 export async function getMyHistory(req, res) {
   if (!req.session || !req.session.user) {
     return res.status(401).json({ message: "로그인이 필요합니다." });
