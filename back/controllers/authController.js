@@ -1,14 +1,13 @@
-// back/controllers/authController.js
 import mysql from 'mysql2';
 import bcrypt from 'bcryptjs';
 
-// 1. DB 연결 설정
+// DB 연결 설정
 const db = mysql.createPool({
   host: '127.0.0.1',
   user: 'root',
-  password: 'root', // ★ 본인의 비밀번호 확인!
+  password: 'root', 
   port: 3306,
-  database: 'CDM',  // ★ 데이터베이스 이름이 맞는지 확인!
+  database: 'CDM',  
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0
@@ -25,30 +24,29 @@ db.getConnection((err, connection) => {
 
 
 
-// 2. 회원가입 (비밀번호 해시 처리 및 에러 처리 개선)
+// 회원가입 (비밀번호 해시 처리 및 에러 처리 개선)
 export const signup = async (req, res) => {
   const {email, password, name} = req.body;
-  console.log("📝 [백엔드] 회원가입 요청 도착! 데이터:", { email, name }); // 비밀번호는 로그에서 제외 (보안)
   const ADMIN_DOMAIN = "cdm.com";
  
   try {
-      // 1단계: 이메일 중복 확인
+      // 이메일 중복 확인
       const [existingUser] = await db.promise().query('SELECT * FROM users WHERE email = ?', [email]);
       if (existingUser.length > 0) {
         return res.status(400).json({ message: "이미 사용 중인 이메일입니다." });
       }
 
-      // 2단계: 비밀번호 해시 처리
+      // 비밀번호 해시 처리
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(password, salt);
 
-      // 3단계 권한
+      // 권한
       const role_id = email.endsWith(ADMIN_DOMAIN) ? 1 : 2; // 도메인에 따라 권한 부여 (1: 관리자, 2: 점검자)
 
-      // 4단계: DB에 사용자 저장
+      // DB에 사용자 저장
       const query = "INSERT INTO users (email, password, name, role_id) VALUES (?, ?, ?, ?)";
       await db.promise().query(query, [email, hashedPassword, name, role_id]);
-      console.log(`✅ 회원가입 성공: ${email} (권한: ${role_id})`);
+      console.log(`회원가입 성공: ${email} (권한: ${role_id})`);
       res.status(201).json({ message: "회원가입 성공" });
       } catch (error) {
       console.error('회원가입 실패:', error);
@@ -57,12 +55,12 @@ export const signup = async (req, res) => {
 };
 
 
-// 3. 로그인 (비밀번호 비교 및 role_id 포함)
+// 로그인 (비밀번호 비교 및 role_id 포함)
 export const login = async (req, res) => {
   const {email, password} = req.body;
   console.log ("📝 [백엔드] 로그인 요청 도착! 데이터:", { email, password }); // 비밀번호는 로그에서 제외 (보안)
     try {
-        // 1. DB에서 해당 이메일 사용자 조회
+        // DB에서 해당 이메일 사용자 조회
         const [users] = await db.promise().query('SELECT * FROM users WHERE email = ?', [email]);
         
         if (users.length === 0) {
@@ -71,13 +69,13 @@ export const login = async (req, res) => {
 
         const user = users[0];
 
-        // 2. 비밀번호 비교 (입력값 vs DB 해시값)
+        // 비밀번호 비교 (입력값 vs DB 해시값)
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
           return res.status(401).json({ message: "비밀번호가 일치하지 않습니다." });
         }
 
-        // 3. 로그인 성공 시 세션에 사용자 정보 저장
+        // 로그인 성공 시 세션에 사용자 정보 저장
         req.session.user = {
           id: user.id,
           email: user.email,
@@ -105,7 +103,7 @@ export const logout = (req, res) => {
   });
 };
 
-// 4. 세션 확인 함수 (프론트엔드 /me 요청에 대응)
+// 세션 확인 함수 (프론트엔드 /me 요청에 대응)
 export const checkSession = (req, res) => {
   // 사용자가 로그인 상태인지(세션이 있는지) 확인합니다.
   if (req.session && req.session.user) {
@@ -118,7 +116,7 @@ export const checkSession = (req, res) => {
   }
 };
 
-// 5. 사용자 목록 조회 (관리자용)
+// 사용자 목록 조회 (관리자용)
 export const getUsers = async (req, res) => {
   try {
     // 비밀번호를 제외한 사용자 정보 조회
@@ -130,7 +128,7 @@ export const getUsers = async (req, res) => {
   }
 };
 
-// 6. 사용자 권한 수정 (관리자용)
+// 사용자 권한 수정 (관리자용)
 export const updateRole = async (req, res) => {
   const { id, role_id } = req.body;
   try {
@@ -141,9 +139,8 @@ export const updateRole = async (req, res) => {
     res.status(500).json({ message: "서버 오류" });
   }
 };
-// back/controllers/authController.js 에 추가
 
-// 7. 사용자 삭제 (관리자용)
+// 사용자 삭제 (관리자용)
 export const deleteUser = async (req, res) => {
   const { id } = req.params;
   try {
@@ -155,7 +152,7 @@ export const deleteUser = async (req, res) => {
   }
 };
 
-// 8. 사용자 비밀번호 수정 (관리자용)
+// 사용자 비밀번호 수정 (관리자용)
 export const updatePassword = async (req, res) => {
   const { id, newPassword } = req.body;
   try {

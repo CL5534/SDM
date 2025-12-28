@@ -23,7 +23,7 @@
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 
-  /* ✅ 헤더는 고정 높이(스크롤 안에 포함 X) */
+  /* 헤더는 고정 높이(스크롤 안에 포함 X) */
   flex: 0 0 auto;
   box-sizing: border-box;
 }
@@ -44,10 +44,10 @@
   border-radius: 8px;
   box-shadow: var(--shadow);
 
-  /* ✅ 핵심: 남은 공간을 차지 + 내용만 세로 스크롤 */
+  /* 핵심: 남은 공간을 차지 + 내용만 세로 스크롤 */
   flex: 1;
   min-height: 0;        /* 🔥 flex 스크롤 버그 방지 */
-  overflow-y: auto;     /* ✅ 아래로 내려가게 */
+  overflow-y: auto;     /* 아래로 내려가게 */
   overflow-x: hidden;
 
   box-sizing: border-box;
@@ -209,7 +209,8 @@
   color: #64748b;
 }
 
-/* ✅ 체크박스 목록만 세로 스크롤 */
+/* 체크박스 목록만 세로 스크롤 */
 .reasonDropdownMenu {
   position: absolute;
-  left:
+
+}

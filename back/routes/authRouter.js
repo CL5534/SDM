@@ -18,7 +18,7 @@ import {
   getFailureReasons,
   createFailureReason,
   getMyHistory, 
-} from "../controllers/Station.js";
+} from "../controllers/station.js";
 
 const router = express.Router();
 
